@@ -5,9 +5,11 @@ import pygame
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 from cohete import Cohete
 from calico import Calico_electronico
+
 
 class AlienInvasion:
     """Clase general para gestionar los recursos y el comportamiento del juego"""
@@ -29,7 +31,10 @@ class AlienInvasion:
         
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
         #self.calico = Calico_electronico(self)
+        
+        self._create_fleet()
         
         # Configura el color de fondo
         self.bg_color = self.settings.bg_color
@@ -42,6 +47,21 @@ class AlienInvasion:
             self._update_bullets()
             self._update_screen()
             self.clock.tick(60)
+            
+    def _create_fleet(self):
+        """Crea la flota de aliens."""
+        # Crea un alienígena y va añadiendo alienígenas hasta que no haya espacio.
+        # La distancia entre alienígenas es equivalente al ancho de un extraterrestre.
+        alien = Alien(self)
+        alien_width = alien.rect.width
+        
+        current_x = alien_width
+        while current_x < (self.settings.screen_width * alien_width):
+            new_alien = Alien(self)
+            new_alien.x = current_x
+            new_alien.rect.x = current_x
+            self.aliens.add(new_alien)
+            current_x += 2 * alien_width
             
     def _check_events(self):
         """Responde a pulsaciones de teclas y eventos de ratón."""
@@ -84,6 +104,7 @@ class AlienInvasion:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.ship.blitme()
+        self.aliens.draw(self.screen)
         #self.calico.blitme()
                 
         pygame.display.flip()
